@@ -145,7 +145,6 @@ export default function InventoryPage() {
   const [requestForm, setRequestForm] = useState({
     medicine_id: 0,
     quantity: 1,
-    batch_code: "",
     expiry_date: "",
     note: "",
   });
@@ -164,7 +163,6 @@ export default function InventoryPage() {
       setRequestForm({
         medicine_id: 0,
         quantity: 1,
-        batch_code: "",
         expiry_date: "",
         note: "",
       });
@@ -406,31 +404,6 @@ export default function InventoryPage() {
                     className="text-label-sm"
                     style={{ color: "var(--on-surface-variant)" }}
                   >
-                    Mã lô
-                  </label>
-                  <input
-                    placeholder="VD: B123-2024"
-                    value={requestForm.batch_code}
-                    onChange={(e) =>
-                      setRequestForm({
-                        ...requestForm,
-                        batch_code: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 5,
-                    flex: 1,
-                  }}
-                >
-                  <label
-                    className="text-label-sm"
-                    style={{ color: "var(--on-surface-variant)" }}
-                  >
                     Hạn sử dụng
                   </label>
                   <input
@@ -444,6 +417,20 @@ export default function InventoryPage() {
                     }
                   />
                 </div>
+              </div>
+
+              <div
+                style={{
+                  background: "var(--surface-container-low)",
+                  border: "1px solid var(--outline-variant)",
+                  borderRadius: 8,
+                  padding: "10px 12px",
+                  color: "var(--on-surface-variant)",
+                  fontSize: "0.82rem",
+                  fontWeight: 600,
+                }}
+              >
+                Mã lô sẽ được hệ thống tự động tạo khi gửi yêu cầu.
               </div>
 
               <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>

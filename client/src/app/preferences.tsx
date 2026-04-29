@@ -534,18 +534,23 @@ const translateElementTree = (root: ParentNode, language: AppLanguage) => {
     const current = node.nodeValue ?? "";
     const last = textLastTranslated.get(node);
     const knownOriginal = textOriginals.get(node);
+
+    if (language === "vi") {
+      if (last !== undefined && current === last && knownOriginal !== undefined) {
+        node.nodeValue = knownOriginal;
+      } else {
+        textOriginals.set(node, current);
+      }
+      textLastTranslated.delete(node);
+      return;
+    }
+
     const original =
       !knownOriginal || (last !== undefined && current !== last)
         ? current
         : knownOriginal;
 
     textOriginals.set(node, original);
-
-    if (language === "vi") {
-      if (current !== original) node.nodeValue = original;
-      textLastTranslated.delete(node);
-      return;
-    }
 
     const next = translateDomText(original);
     if (current !== next) node.nodeValue = next;
@@ -562,6 +567,21 @@ const translateElementTree = (root: ParentNode, language: AppLanguage) => {
       const current = element.getAttribute(attr) ?? "";
       const previousOriginal = originals[attr];
       const previousTranslated = lastTranslated[attr];
+
+      if (language === "vi") {
+        if (
+          previousTranslated !== undefined &&
+          current === previousTranslated &&
+          previousOriginal !== undefined
+        ) {
+          element.setAttribute(attr, previousOriginal);
+        } else {
+          originals[attr] = current;
+        }
+        delete lastTranslated[attr];
+        return;
+      }
+
       const original =
         !previousOriginal ||
         (previousTranslated !== undefined && current !== previousTranslated)
@@ -569,12 +589,6 @@ const translateElementTree = (root: ParentNode, language: AppLanguage) => {
           : previousOriginal;
 
       originals[attr] = original;
-
-      if (language === "vi") {
-        if (current !== original) element.setAttribute(attr, original);
-        delete lastTranslated[attr];
-        return;
-      }
 
       const next = translateDomText(original);
       if (current !== next) element.setAttribute(attr, next);
@@ -615,6 +629,46 @@ type PreferencesContextValue = {
 
 const PreferencesContext = createContext<PreferencesContextValue | null>(null);
 
+type AppAlert = {
+  id: number;
+  message: string;
+  tone: "success" | "warning" | "error" | "info";
+};
+
+const getAlertTone = (message: string): AppAlert["tone"] => {
+  const lower = message.toLowerCase();
+  if (
+    lower.includes("lỗi") ||
+    lower.includes("thất bại") ||
+    lower.includes("không thể") ||
+    lower.includes("failed") ||
+    lower.includes("error")
+  ) {
+    return "error";
+  }
+
+  if (
+    lower.includes("vui lòng") ||
+    lower.includes("thiếu") ||
+    lower.includes("đầy") ||
+    lower.includes("please") ||
+    lower.includes("missing")
+  ) {
+    return "warning";
+  }
+
+  if (
+    lower.includes("thành công") ||
+    lower.includes("đã ") ||
+    lower.includes("success") ||
+    lower.includes("confirmed")
+  ) {
+    return "success";
+  }
+
+  return "info";
+};
+
 const getStoredLanguage = (): AppLanguage => {
   if (typeof window === "undefined") return "vi";
   return localStorage.getItem("app-language") === "en" ? "en" : "vi";
@@ -628,6 +682,7 @@ const getStoredTheme = (): AppTheme => {
 export function PreferencesProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<AppLanguage>(getStoredLanguage);
   const [theme, setThemeState] = useState<AppTheme>(getStoredTheme);
+  const [appAlert, setAppAlert] = useState<AppAlert | null>(null);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -685,13 +740,30 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     const nativeAlert = window.alert;
     window.alert = (message?: unknown) => {
       const text = String(message ?? "");
-      nativeAlert(language === "en" ? translateDomText(text) : text);
+      const translatedText = language === "en" ? translateDomText(text) : text;
+      setAppAlert({
+        id: Date.now(),
+        message: translatedText,
+        tone: getAlertTone(translatedText),
+      });
     };
 
     return () => {
       window.alert = nativeAlert;
     };
   }, [language]);
+
+  useEffect(() => {
+    if (!appAlert) return;
+
+    const timeoutId = window.setTimeout(() => {
+      setAppAlert((current) =>
+        current?.id === appAlert.id ? null : current,
+      );
+    }, 5000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [appAlert]);
 
   const value = useMemo<PreferencesContextValue>(
     () => ({
@@ -711,6 +783,130 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
   return (
     <PreferencesContext.Provider value={value}>
       {children}
+      {appAlert && (
+        <div
+          role="presentation"
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 10000,
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "center",
+            padding: "72px 16px 16px",
+            pointerEvents: "none",
+          }}
+        >
+          <div
+            key={appAlert.id}
+            role="alertdialog"
+            aria-modal="true"
+            aria-label={language === "en" ? "Notification" : "Thông báo"}
+            style={{
+              width: "min(420px, 100%)",
+              background: "var(--surface-container-lowest)",
+              border: "1px solid var(--outline-variant)",
+              borderLeft: `5px solid ${
+                appAlert.tone === "success"
+                  ? "#059669"
+                  : appAlert.tone === "warning"
+                    ? "#F59E0B"
+                    : appAlert.tone === "error"
+                      ? "var(--error)"
+                      : "var(--primary)"
+              }`,
+              borderRadius: 12,
+              boxShadow: "0 24px 60px rgba(25, 28, 30, 0.24)",
+              padding: 18,
+              display: "grid",
+              gridTemplateColumns: "36px 1fr auto",
+              gap: 12,
+              alignItems: "flex-start",
+              pointerEvents: "auto",
+              animation: "fadeIn 0.18s ease",
+            }}
+          >
+            <span
+              className="material-symbols-outlined"
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 10,
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background:
+                  appAlert.tone === "success"
+                    ? "rgba(5, 150, 105, 0.12)"
+                    : appAlert.tone === "warning"
+                      ? "rgba(245, 158, 11, 0.14)"
+                      : appAlert.tone === "error"
+                        ? "rgba(186, 26, 26, 0.12)"
+                        : "rgba(0, 40, 142, 0.12)",
+                color:
+                  appAlert.tone === "success"
+                    ? "#059669"
+                    : appAlert.tone === "warning"
+                      ? "#B45309"
+                      : appAlert.tone === "error"
+                        ? "var(--error)"
+                        : "var(--primary)",
+                fontSize: 21,
+              }}
+            >
+              {appAlert.tone === "success"
+                ? "check_circle"
+                : appAlert.tone === "warning"
+                  ? "warning"
+                  : appAlert.tone === "error"
+                    ? "error"
+                    : "info"}
+            </span>
+            <div>
+              <div
+                style={{
+                  fontWeight: 800,
+                  color: "var(--on-surface)",
+                  marginBottom: 4,
+                }}
+              >
+                {language === "en" ? "Notification" : "Thông báo"}
+              </div>
+              <div
+                style={{
+                  color: "var(--on-surface-variant)",
+                  fontSize: "0.92rem",
+                  lineHeight: 1.5,
+                  whiteSpace: "pre-wrap",
+                }}
+              >
+                {appAlert.message}
+              </div>
+            </div>
+            <button
+              type="button"
+              aria-label={language === "en" ? "Close" : "Đóng"}
+              onClick={() => setAppAlert(null)}
+              style={{
+                width: 32,
+                height: 32,
+                border: "none",
+                borderRadius: 8,
+                background: "var(--surface-container-low)",
+                color: "var(--on-surface-variant)",
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+                close
+              </span>
+            </button>
+          </div>
+        </div>
+      )}
     </PreferencesContext.Provider>
   );
 }

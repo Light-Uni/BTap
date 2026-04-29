@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { CabinetInfo } from "../../types/inventoryMap";
 import { ROLES } from "../../constants/role";
+import { getWarehouseByFloor } from "../../constants/warehouse";
 
 interface Props {
   cabinet: CabinetInfo;
@@ -31,6 +32,7 @@ export default function CabinetDetailModal({
 }: Props) {
   const [loading, setLoading] = useState(false);
   const isStorekeeper = userRole === ROLES.STOREKEEPER;
+  const warehouse = getWarehouseByFloor(cabinet.floor);
 
   const handleToggleFull = async () => {
     setLoading(true);
@@ -106,7 +108,7 @@ export default function CabinetDetailModal({
                 lineHeight: 1.2,
               }}
             >
-              Tầng {cabinet.floor} · Phòng {cabinet.room} · {cabinet.label}
+              {warehouse.description} · Phòng {cabinet.room} · {cabinet.label}
             </div>
             <div
               style={{

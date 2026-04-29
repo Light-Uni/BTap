@@ -35,10 +35,10 @@ exports.create = async (req, res) => {
 exports.receive = async (req, res) => {
   try {
     const { batch_code, quantity, expiry_date, status, note, position } = req.body;
-    if (!batch_code || !quantity || !expiry_date) {
+    if (!quantity || !expiry_date || !position) {
       return res.status(400).json({ message: "Thiếu thông tin lô hàng" });
     }
-    const batchId = await ImportRequest.receive(req.params.id, {
+    const result = await ImportRequest.receive(req.params.id, {
       batch_code,
       quantity,
       expiry_date,
@@ -46,7 +46,7 @@ exports.receive = async (req, res) => {
       note,
       position,
     });
-    res.json({ batchId, message: "Xác nhận nhận hàng thành công" });
+    res.json({ ...result, message: "Xác nhận nhận hàng thành công" });
   } catch (err) {
     const statusCode = err.status || 500;
     res.status(statusCode).json({ message: err.message });

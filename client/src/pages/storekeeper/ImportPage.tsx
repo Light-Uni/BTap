@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from "react";
 import { PageHeader, MetricCard, StatusPill, Icon, EmptyState } from "../../components/UI";
 import { getImportRequests, receiveImportRequest, rejectImportRequest } from "../../api/medicineRequestApi";
 import { getInventoryMap } from "../../api/inventoryMapApi";
+import { WAREHOUSE_FLOORS, getWarehouseByFloor } from "../../constants/warehouse";
 
 /* ─── Giữ nguyên types ─── */
 type RequestSource = "manager" | "requestor";
@@ -29,6 +30,7 @@ export default function ImportRequestPage() {
   const [status, setStatus] = useState<"full" | "partial" | "excess">("full");
   const [note, setNote] = useState("");
   const [quantity, setQuantity] = useState<number>(0);
+  const [expiryDate, setExpiryDate] = useState("");
   const [floor, setFloor] = useState<number>(1);
   const [room, setRoom] = useState<string>("A");
   const [cabinet, setCabinet] = useState<string>("M1");
@@ -80,6 +82,7 @@ export default function ImportRequestPage() {
     pending: requests.filter((r) => r.status === "pending").length,
     processed: requests.filter((r) => r.status === "processed").length,
   }), [requests]);
+  const selectedPosition = `F${floor}-${room}-${cabinet}`;
 
   const handleReject = async () => {
     if (!selected) return;
@@ -104,27 +107,33 @@ export default function ImportRequestPage() {
   const handleSubmit = async () => {
     if (!selected) return;
     const posKey = `F${floor}-${room}-${cabinet}`;
+    if (!expiryDate) {
+      alert("Vui lòng nhập hạn sử dụng.");
+      return;
+    }
     if (fullPositions.includes(posKey)) {
       alert("Vị trí này đã được đánh dấu là đầy! Vui lòng chọn vị trí khác.");
       return;
     }
     try {
-      await receiveImportRequest(selected.id, {
-        batch_code: selected.batch_code || "",
+      const res = await receiveImportRequest(selected.id, {
+        batch_code: selected.batch_code,
         quantity: quantity || selected.quantity || 1,
-        position: `F${floor}-${room}-${cabinet}`,
-        expiry_date: selected.expiry_date || "",
+        position: posKey,
+        expiry_date: expiryDate,
         status,
         note,
       });
+      const batchCode = res.data?.batchCode || selected.batch_code;
       // Cập nhật UI local
       setRequests((prev) =>
-        prev.map((r) => (r.id === selected.id ? { ...r, status: "processed" } : r))
+        prev.map((r) => (r.id === selected.id ? { ...r, status: "processed", batch_code: batchCode } : r))
       );
       setSelected(null);
       setStatus("full");
       setNote("");
       setQuantity(0);
+      setExpiryDate("");
       alert("Xác nhận nhận hàng thành công!");
     } catch (err: any) {
       alert(err.response?.data?.message || "Lỗi khi xác nhận nhận hàng");
@@ -167,7 +176,7 @@ export default function ImportRequestPage() {
                   <td style={{ fontWeight: 700 }}>#{r.id}</td>
                   <td>{r.createdAt}</td>
                   <td style={{ fontWeight: 600 }}>{r.medicine_name || "—"}</td>
-                  <td>{r.batch_code || "—"}</td>
+                  <td>{r.batch_code || "Tự động"}</td>
                   <td style={{ fontWeight: 600 }}>{r.quantity}</td>
                   <td>
                     <StatusPill 
@@ -180,7 +189,7 @@ export default function ImportRequestPage() {
                       className="btn btn-primary"
                       style={{ padding: "6px 14px", fontSize: "0.8rem" }}
                       disabled={r.status !== "pending"}
-                      onClick={() => { setSelected(r); setQuantity(r.quantity || 0); }}
+                      onClick={() => { setSelected(r); setQuantity(r.quantity || 0); setExpiryDate(r.expiry_date || ""); }}
                     >
                       <Icon name="check_circle" size={14} /> Xử lý
                     </button>
@@ -212,8 +221,8 @@ export default function ImportRequestPage() {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))", gap: 12, marginBottom: 16 }}>
               {[
                 { label: "Thuốc", value: selected.medicine_name || selected.items[0]?.productName },
-                { label: "Mã lô", value: selected.batch_code || "—" },
-                { label: "HSD", value: selected.expiry_date ? new Date(selected.expiry_date).toLocaleDateString("vi-VN") : "—" },
+                { label: "Mã lô", value: selected.batch_code || "Tự động tạo" },
+                { label: "HSD", value: expiryDate ? new Date(expiryDate).toLocaleDateString("vi-VN") : "Chưa nhập" },
                 { label: "Số lượng YC", value: getTotal(selected.items) },
                 { label: "Ghi chú", value: selected.note || "—" },
               ].map((s) => (
@@ -232,12 +241,18 @@ export default function ImportRequestPage() {
                   <input type="number" min={1} value={quantity} onChange={(e) => setQuantity(Number(e.target.value))} />
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                  <label className="text-label-sm" style={{ color: "var(--on-surface-variant)" }}>Vị trí lưu trữ (Tầng - Phòng - Tủ)</label>
+                  <label className="text-label-sm" style={{ color: "var(--on-surface-variant)" }}>Hạn sử dụng</label>
+                  <input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} />
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                  <label className="text-label-sm" style={{ color: "var(--on-surface-variant)" }}>Vị trí lưu trữ</label>
                   <div style={{ display: "flex", gap: 8 }}>
                     <select value={floor} onChange={(e) => setFloor(Number(e.target.value))} style={{ flex: 1 }}>
-                      <option value={1}>Tầng 1</option>
-                      <option value={2}>Tầng 2</option>
-                      <option value={3}>Tầng 3</option>
+                      {WAREHOUSE_FLOORS.map((warehouse) => (
+                        <option key={warehouse.floor} value={warehouse.floor}>
+                          {warehouse.description}
+                        </option>
+                      ))}
                     </select>
                     <select value={room} onChange={(e) => setRoom(e.target.value)} style={{ flex: 1 }}>
                       <option value="A">Phòng A</option>
@@ -257,6 +272,9 @@ export default function ImportRequestPage() {
                       })}
                     </select>
                   </div>
+                  <span style={{ fontSize: "0.72rem", color: "var(--on-surface-variant)" }}>
+                    Đang chọn {getWarehouseByFloor(floor).shortName}; vị trí: {selectedPosition}
+                  </span>
                 </div>
               </div>
             </div>

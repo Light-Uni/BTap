@@ -4,6 +4,7 @@ import { useAppSelector } from "../../../app/hooks";
 import { getInventoryMap, setCabinetFull } from "../../../api/inventoryMapApi";
 import CabinetGrid from "../../../components/inventoryMap/CabinetGrid";
 import CabinetDetailModal from "../../../components/inventoryMap/CabinetDetailModal";
+import { WAREHOUSE_FLOOR_NUMBERS, getWarehouseByFloor } from "../../../constants/warehouse";
 import type {
   MapBatchItem,
   CabinetInfo,
@@ -12,7 +13,7 @@ import type {
 } from "../../../types/inventoryMap";
 
 // ── Constants ───────────────────────────────────────────────────────────────
-const FLOORS  = [1, 2, 3];
+const FLOORS  = WAREHOUSE_FLOOR_NUMBERS;
 const ROOMS   = ["A", "B", "C"];
 const CABINETS = Array.from({ length: 10 }, (_, i) => `M${i + 1}`);
 
@@ -182,7 +183,7 @@ export default function WarehouseMapPage() {
     <div className="page animate-fade-in" style={{ display: "flex", flexDirection: "column", height: "100%", gap: 20 }}>
       <PageHeader
         title="Sơ đồ Kho Dược"
-        subtitle="Quản lý vị trí, trạng thái tủ thuốc theo phòng và tầng"
+        subtitle="Quản lý vị trí, trạng thái tủ thuốc theo kho chứa, phòng và tủ"
       />
 
       {/* ── KPI strip ── */}
@@ -242,7 +243,7 @@ export default function WarehouseMapPage() {
                   className={`tab${activeFloor === f ? " active" : ""}`}
                   onClick={() => { setActiveFloor(f); setSelectedKey(null); }}
                 >
-                  Tầng {f}
+                  {getWarehouseByFloor(f).description}
                 </button>
               ))}
             </div>
@@ -271,7 +272,7 @@ export default function WarehouseMapPage() {
           {/* Utilisation bar */}
           <div style={{ marginBottom: 20 }}>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.78rem", color: "var(--on-surface-variant)", marginBottom: 6 }}>
-              <span>Hiệu suất sử dụng tầng {activeFloor}</span>
+              <span>Hiệu suất sử dụng {getWarehouseByFloor(activeFloor).shortName}</span>
               <span style={{ fontWeight: 700 }}>{stats.utilization}%</span>
             </div>
             <div className="progress-bar">
@@ -295,7 +296,7 @@ export default function WarehouseMapPage() {
           {/* Empty state if no batches assigned to this floor */}
           {allCabinets.every((c) => c.status === "empty") && (
             <div style={{ marginTop: 16 }}>
-              <EmptyState icon="inventory_2" message="Chưa có thuốc nào được gán vị trí ở tầng này" />
+              <EmptyState icon="inventory_2" message={`Chưa có thuốc nào được gán vị trí ở ${getWarehouseByFloor(activeFloor).shortName}`} />
             </div>
           )}
         </div>

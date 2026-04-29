@@ -1,5 +1,21 @@
 const db = require("../config/db");
 
+function generateBatchCode(medicineId) {
+  const now = new Date();
+  const date = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, "0"),
+    String(now.getDate()).padStart(2, "0"),
+  ].join("");
+  const time = [
+    String(now.getHours()).padStart(2, "0"),
+    String(now.getMinutes()).padStart(2, "0"),
+    String(now.getSeconds()).padStart(2, "0"),
+  ].join("");
+  const suffix = Math.random().toString(36).slice(2, 5).toUpperCase();
+  return `LO-${medicineId}-${date}-${time}-${suffix}`;
+}
+
 const ImportRequest = {
   // Lấy tất cả yêu cầu nhập kho
   async getAll() {
@@ -16,10 +32,11 @@ const ImportRequest = {
   // Tạo yêu cầu nhập kho (manager)
   async create(data) {
     const { medicine_id, batch_code, expiry_date, quantity, created_by, note } = data;
+    const finalBatchCode = batch_code?.trim() || generateBatchCode(medicine_id);
     const [result] = await db.query(
       `INSERT INTO import_requests (medicine_id, batch_code, expiry_date, quantity, status, created_by, note)
        VALUES (?, ?, ?, ?, 'PENDING', ?, ?)`,
-      [medicine_id, batch_code || "", expiry_date || null, quantity, created_by, note || ""]
+      [medicine_id, finalBatchCode, expiry_date || null, quantity, created_by, note || ""]
     );
     return result.insertId;
   },
@@ -37,19 +54,27 @@ const ImportRequest = {
         [id]
       );
       if (!req) throw { status: 404, message: "Không tìm thấy yêu cầu nhập" };
+      const finalBatchCode =
+        batch_code?.trim() || req.batch_code?.trim() || generateBatchCode(req.medicine_id);
 
       // INSERT batch mới
       const [batchResult] = await conn.query(
         `INSERT INTO batches (medicine_id, batch_code, quantity, import_date, expiry_date, position)
          VALUES (?, ?, ?, NOW(), ?, ?)`,
-        [req.medicine_id, batch_code, quantity, expiry_date, position]
+        [req.medicine_id, finalBatchCode, quantity, expiry_date, position]
       );
       const batchId = batchResult.insertId;
 
       // UPDATE import_requests.status
       await conn.query(
-        `UPDATE import_requests SET status = 'RECEIVED', received_date = NOW() WHERE id = ?`,
-        [id]
+        `UPDATE import_requests
+         SET status = 'RECEIVED',
+             received_date = NOW(),
+             batch_code = ?,
+             expiry_date = ?,
+             position = ?
+         WHERE id = ?`,
+        [finalBatchCode, expiry_date, position, id]
       );
 
       // Ghi inventory_log
@@ -68,7 +93,10 @@ const ImportRequest = {
       );
 
       await conn.commit();
-      return batchId;
+      return { batchId, batchCode: finalBatchCode };
+    } catch (err) {
+      await conn.rollback();
+      throw err;
     } finally {
       conn.release();
     }
