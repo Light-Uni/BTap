@@ -1,100 +1,187 @@
 const cron = require("node-cron");
 const db = require("../config/db");
-const { sendNearExpiryAlert, sendLowStockAlert } = require("../services/emailService");
+const {
+  sendExpiredMedicineAlert,
+  sendNearExpiryAlert,
+  sendLowStockAlert,
+} = require("../services/emailService");
 
-// Chạy mỗi ngày lúc 8:00 sáng
-cron.schedule("0 8 * * *", async () => {
-  // ── Lấy danh sách email MANAGER (dùng chung cho cả 2 loại cảnh báo) ──
-  let managers = [];
-  try {
-    const [rows] = await db.query(
-      `SELECT email, name FROM users WHERE role = 'MANAGER' AND email IS NOT NULL`
-    );
-    managers = rows;
-  } catch (err) {
-    console.error("[ExpiryAlertJob] Lỗi lấy danh sách manager:", err.message);
+const ALERT_ROLES = ["MANAGER", "STOREKEEPER"];
+const parsedNearExpiryMonths = Number(process.env.NEAR_EXPIRY_MONTHS || 6);
+const NEAR_EXPIRY_MONTHS =
+  Number.isFinite(parsedNearExpiryMonths) && parsedNearExpiryMonths > 0
+    ? Math.max(1, Math.floor(parsedNearExpiryMonths))
+    : 6;
+const DAILY_ALERT_CRON = process.env.EXPIRY_ALERT_CRON || "0 7 * * *";
+
+const getRecipientsByRoles = async (roles) => {
+  const placeholders = roles.map(() => "?").join(", ");
+  const [rows] = await db.query(
+    `SELECT email, name, role
+     FROM users
+     WHERE role IN (${placeholders})
+       AND email IS NOT NULL
+       AND email <> ''`,
+    roles,
+  );
+
+  return rows;
+};
+
+const getExpiredItems = async () => {
+  const [rows] = await db.query(`
+    SELECT
+      m.name,
+      b.batch_code,
+      b.expiry_date,
+      b.quantity,
+      b.position
+    FROM batches b
+    JOIN medicines m ON m.id = b.medicine_id
+    WHERE b.expiry_date < CURDATE()
+      AND b.quantity > 0
+      AND m.is_deleted = 0
+    ORDER BY b.expiry_date ASC, m.name ASC
+  `);
+
+  return rows;
+};
+
+const getNearExpiryItems = async () => {
+  const [rows] = await db.query(
+    `
+    SELECT
+      m.name,
+      b.batch_code,
+      b.expiry_date,
+      b.quantity,
+      b.position
+    FROM batches b
+    JOIN medicines m ON m.id = b.medicine_id
+    WHERE b.expiry_date >= CURDATE()
+      AND b.expiry_date <= DATE_ADD(CURDATE(), INTERVAL ? MONTH)
+      AND b.quantity > 0
+      AND m.is_deleted = 0
+    ORDER BY b.expiry_date ASC, m.name ASC
+  `,
+    [NEAR_EXPIRY_MONTHS],
+  );
+
+  return rows;
+};
+
+const getLowStockItems = async () => {
+  const [rows] = await db.query(`
+    SELECT
+      m.id AS medicine_id,
+      m.name,
+      COALESCE(SUM(b.quantity), 0) AS current_stock,
+      m.min_stock,
+      (m.min_stock - COALESCE(SUM(b.quantity), 0)) AS deficit
+    FROM medicines m
+    LEFT JOIN batches b ON b.medicine_id = m.id AND b.quantity > 0
+    WHERE m.is_deleted = 0
+      AND m.min_stock > 0
+    GROUP BY m.id, m.name, m.min_stock
+    HAVING current_stock <= m.min_stock
+    ORDER BY deficit DESC, m.name ASC
+  `);
+
+  return rows;
+};
+
+const sendAlertToRecipients = async ({ recipients, items, type, send }) => {
+  if (items.length === 0) {
+    console.log(`[ExpiryAlertJob] No ${type} items found.`);
     return;
   }
 
-  if (managers.length === 0) {
-    console.log("[ExpiryAlertJob] Không có manager nào để gửi email.");
+  if (recipients.length === 0) {
+    console.log(`[ExpiryAlertJob] No recipients found for ${type} alert.`);
     return;
   }
 
-  // ══════════════════════════════════════════════
-  // 1. CẢNH BÁO LÔ THUỐC CẬN DATE
-  // ══════════════════════════════════════════════
-  try {
-    console.log("[ExpiryAlertJob] Đang kiểm tra lô thuốc cận date...");
-
-    const [expiryItems] = await db.query(`
-      SELECT
-        m.name,
-        b.batch_code,
-        b.expiry_date,
-        b.quantity
-      FROM batches b
-      JOIN medicines m ON m.id = b.medicine_id
-      WHERE b.expiry_date <= DATE_ADD(NOW(), INTERVAL 6 MONTH)
-        AND b.quantity > 0
-      ORDER BY b.expiry_date ASC
-    `);
-
-    if (expiryItems.length > 0) {
-      for (const manager of managers) {
-        try {
-          await sendNearExpiryAlert(manager.email, expiryItems);
-          console.log(`[ExpiryAlertJob] Gửi cảnh báo cận date → ${manager.email}`);
-        } catch (emailErr) {
-          console.error(`[ExpiryAlertJob] Lỗi gửi email cận date → ${manager.email}:`, emailErr.message);
-        }
-      }
-      console.log(`[ExpiryAlertJob] Cận date: ${expiryItems.length} lô, gửi cho ${managers.length} manager.`);
-    } else {
-      console.log("[ExpiryAlertJob] Không có lô thuốc cận date.");
+  for (const recipient of recipients) {
+    try {
+      await send(recipient.email, items);
+      console.log(
+        `[ExpiryAlertJob] Sent ${type} alert to ${recipient.email} (${recipient.role}).`,
+      );
+    } catch (err) {
+      console.error(
+        `[ExpiryAlertJob] Failed sending ${type} alert to ${recipient.email}:`,
+        err.message,
+      );
     }
-  } catch (err) {
-    console.error("[ExpiryAlertJob] Lỗi kiểm tra cận date:", err.message);
   }
 
-  // ══════════════════════════════════════════════
-  // 2. CẢNH BÁO TỒN KHO DƯỚI NGƯỠNG (min_stock)
-  // ══════════════════════════════════════════════
+  console.log(
+    `[ExpiryAlertJob] ${type}: ${items.length} item(s), ${recipients.length} recipient(s).`,
+  );
+};
+
+const runExpiryAlertJob = async () => {
+  let expiryRecipients = [];
+  let managerRecipients = [];
+
   try {
-    console.log("[ExpiryAlertJob] Đang kiểm tra tồn kho dưới ngưỡng...");
-
-    const [lowStockItems] = await db.query(`
-      SELECT
-        m.id            AS medicine_id,
-        m.name,
-        COALESCE(SUM(b.quantity), 0)                      AS current_stock,
-        m.min_stock,
-        (m.min_stock - COALESCE(SUM(b.quantity), 0))      AS deficit
-      FROM medicines m
-      LEFT JOIN batches b ON b.medicine_id = m.id AND b.quantity > 0
-      WHERE m.is_deleted = 0
-        AND m.min_stock > 0
-      GROUP BY m.id, m.name, m.min_stock
-      HAVING current_stock <= m.min_stock
-      ORDER BY deficit DESC
-    `);
-
-    if (lowStockItems.length > 0) {
-      for (const manager of managers) {
-        try {
-          await sendLowStockAlert(manager.email, lowStockItems);
-          console.log(`[ExpiryAlertJob] Gửi cảnh báo tồn kho thấp → ${manager.email}`);
-        } catch (emailErr) {
-          console.error(`[ExpiryAlertJob] Lỗi gửi email tồn kho thấp → ${manager.email}:`, emailErr.message);
-        }
-      }
-      console.log(`[ExpiryAlertJob] Tồn kho thấp: ${lowStockItems.length} mặt hàng, gửi cho ${managers.length} manager.`);
-    } else {
-      console.log("[ExpiryAlertJob] Không có thuốc nào dưới ngưỡng tồn kho tối thiểu.");
-    }
+    expiryRecipients = await getRecipientsByRoles(ALERT_ROLES);
+    managerRecipients = expiryRecipients.filter((recipient) => recipient.role === "MANAGER");
   } catch (err) {
-    console.error("[ExpiryAlertJob] Lỗi kiểm tra tồn kho:", err.message);
+    console.error("[ExpiryAlertJob] Failed loading alert recipients:", err.message);
+    return;
   }
+
+  if (expiryRecipients.length === 0) {
+    console.log("[ExpiryAlertJob] No MANAGER or STOREKEEPER email recipients found.");
+    return;
+  }
+
+  try {
+    const expiredItems = await getExpiredItems();
+    await sendAlertToRecipients({
+      recipients: expiryRecipients,
+      items: expiredItems,
+      type: "expired medicine",
+      send: sendExpiredMedicineAlert,
+    });
+  } catch (err) {
+    console.error("[ExpiryAlertJob] Failed checking expired medicines:", err.message);
+  }
+
+  try {
+    const nearExpiryItems = await getNearExpiryItems();
+    await sendAlertToRecipients({
+      recipients: expiryRecipients,
+      items: nearExpiryItems,
+      type: "near-expiry medicine",
+      send: sendNearExpiryAlert,
+    });
+  } catch (err) {
+    console.error("[ExpiryAlertJob] Failed checking near-expiry medicines:", err.message);
+  }
+
+  try {
+    const lowStockItems = await getLowStockItems();
+    await sendAlertToRecipients({
+      recipients: managerRecipients,
+      items: lowStockItems,
+      type: "low-stock",
+      send: sendLowStockAlert,
+    });
+  } catch (err) {
+    console.error("[ExpiryAlertJob] Failed checking low stock:", err.message);
+  }
+};
+
+cron.schedule(DAILY_ALERT_CRON, runExpiryAlertJob, {
+  timezone: process.env.TZ || "Asia/Ho_Chi_Minh",
 });
 
-console.log("[ExpiryAlertJob] Đã đăng ký cron job (mỗi ngày 8:00 sáng).");
+console.log(
+  `[ExpiryAlertJob] Registered cron job "${DAILY_ALERT_CRON}" for MANAGER and STOREKEEPER recipients.`,
+);
+
+module.exports = {
+  runExpiryAlertJob,
+};
