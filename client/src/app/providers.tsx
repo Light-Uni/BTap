@@ -13,7 +13,7 @@ export default function Providers({ children }: ProvidersProps) {
   return (
     <Provider store={store}>
       <PreferencesProvider>
-        <BrowserRouter>{children}</BrowserRouter>
+        <BrowserRouter basename={import.meta.env.BASE_URL}>{children}</BrowserRouter>
         <ToastContainer position="top-right" autoClose={2500} />
       </PreferencesProvider>
     </Provider>
