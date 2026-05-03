@@ -20,15 +20,13 @@ export default function MedicineCard({
 }: Props) {
   return (
     <div
-      className={`relative w-full h-66 flex flex-col items-center justify-center border rounded-2xl ${
-        medicine.is_deleted
-          ? "bg-red-100 border-red-300 opacity-70"
-          : "bg-white border-gray-500"
+      className={`medicine-card relative w-full h-66 flex flex-col items-center justify-center ${
+        medicine.is_deleted ? "medicine-card--deleted opacity-80" : ""
       }`}
     >
       {/* 🔴 BADGE (KHÔNG bị grayscale) */}
       {Boolean(medicine.is_deleted) && (
-        <div className="absolute top-1 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded-md z-20">
+        <div className="medicine-card__badge absolute top-1 left-2 text-xs px-2 py-1 rounded-md z-20">
           Tạm ngừng nhập kho
         </div>
       )}
@@ -40,7 +38,7 @@ export default function MedicineCard({
               {/* EDIT */}
               <button
                 onClick={() => onEdit?.(medicine)}
-                className="p-1 rounded-full bg-[#4CA1AF]/10 hover:bg-[#4CA1AF]/20 text-[#2C3E50]"
+                className="medicine-card__icon-button p-1 rounded-full"
               >
                 <Pencil size={16} />
               </button>
@@ -48,7 +46,7 @@ export default function MedicineCard({
               {/* DELETE */}
               <button
                 onClick={() => onDelete?.(medicine)}
-                className="p-1 rounded-full bg-red-50 hover:bg-red-100 text-red-500"
+                className="medicine-card__icon-button medicine-card__icon-button--danger p-1 rounded-full"
               >
                 <X size={16} />
               </button>
@@ -57,7 +55,7 @@ export default function MedicineCard({
             /* 🔓 RESTORE */
             <button
               onClick={() => onRestore?.(medicine)}
-              className="p-1 rounded-full bg-[#4CA1AF]/10 hover:bg-[#4CA1AF]/20 text-[#4CA1AF]"
+              className="medicine-card__icon-button p-1 rounded-full"
             >
               <ArchiveRestore size={16} />
             </button>
@@ -77,11 +75,11 @@ export default function MedicineCard({
         />
 
         <div className="p-3 text-center">
-          <h2 className="text-lg font-semibold text-gray-800">
+          <h2 className="medicine-card__title text-lg font-semibold">
             {medicine.name}
           </h2>
 
-          <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+          <p className="medicine-card__description text-sm mt-1 line-clamp-2">
             {medicine.description}
           </p>
         </div>

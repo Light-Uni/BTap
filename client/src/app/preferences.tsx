@@ -675,8 +675,9 @@ const getStoredLanguage = (): AppLanguage => {
 };
 
 const getStoredTheme = (): AppTheme => {
-  if (typeof window === "undefined") return "light";
-  return localStorage.getItem("app-theme") === "dark" ? "dark" : "light";
+  if (typeof window === "undefined") return "dark";
+  const storedTheme = localStorage.getItem("app-theme");
+  return storedTheme === "light" ? "light" : "dark";
 };
 
 export function PreferencesProvider({ children }: { children: ReactNode }) {

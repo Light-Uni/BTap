@@ -64,7 +64,7 @@ export default function AuthLayout() {
             fontWeight: 600,
             fontSize: "clamp(24px, 4vw, 44px)",
             color: "#fff",
-            letterSpacing: "-4px",
+            letterSpacing: 0,
             lineHeight: 1.1,
             margin: "0 0 4px 0",
             textShadow: "0 2px 20px rgba(0,0,0,0.3)",
@@ -80,7 +80,7 @@ export default function AuthLayout() {
             lineHeight: 1.05,
             margin: 0,
             textShadow: "0 4px 32px rgba(0,0,0,0.25)",
-            letterSpacing: "-1px",
+            letterSpacing: 0,
           }}>
             {t("auth.hero.line2")}
           </p>
