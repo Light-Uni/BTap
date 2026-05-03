@@ -150,7 +150,7 @@ export default function ImportRequestPage() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 16, marginBottom: 20 }}>
         <MetricCard label="Tổng yêu cầu" value={stats.total} icon="inbox" color="var(--primary)" />
         <MetricCard label="Chờ xử lý" value={stats.pending} icon="pending" color="#F59E0B" borderColor={stats.pending > 0 ? "#F59E0B" : undefined} />
-        <MetricCard label="Đã xử lý" value={stats.processed} icon="check_circle" color="#059669" />
+        <MetricCard label="Đã xử lý" value={stats.processed} icon="check_circle" color="#4CA1AF" />
       </div>
 
       {/* ─── Table ─── */}

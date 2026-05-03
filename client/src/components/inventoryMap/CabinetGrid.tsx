@@ -8,7 +8,7 @@ interface Props {
 }
 
 const BG_COLOR: Record<CabinetStatus, string> = {
-  safe:    "#059669",
+  safe:    "#4CA1AF",
   near:    "#F59E0B",
   expired: "#EF4444",
   empty:   "var(--surface-container-high)",
@@ -62,7 +62,7 @@ export default function CabinetGrid({ room, cabinets, selectedKey, onSelect }: P
                 border: isDashed
                   ? "2px dashed var(--outline)"
                   : isSelected
-                    ? "3px solid #1D4ED8"
+                    ? "3px solid #4CA1AF"
                     : "2px solid transparent",
                 color: clr,
                 display: "flex", flexDirection: "column",
@@ -70,7 +70,7 @@ export default function CabinetGrid({ room, cabinets, selectedKey, onSelect }: P
                 gap: 3,
                 cursor: "pointer", fontWeight: 700, fontSize: "0.8rem",
                 boxShadow: isSelected
-                  ? "0 0 0 3px rgba(29,78,216,0.35)"
+                  ? "0 0 0 3px rgba(76,161,175,0.35)"
                   : "0 2px 4px rgba(0,0,0,0.06)",
                 transform: isSelected ? "scale(1.08)" : "none",
                 transition: "all 0.18s",

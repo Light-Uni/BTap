@@ -18,10 +18,12 @@ import TakeRequestPage from "../pages/pharmacist/TakeRequestPage";
 import ReturnMedicinePage from "../pages/pharmacist/ReturnRequestPage";
 import RequestHistoryPage from "../pages/pharmacist/RequestHistoryPage";
 import MedicinePage from "../pages/common/requesterManager/MedicinePage";
+import ExportConfirmationPanel from "../components/ExportConfirmationPanel";
 
 import InventoryPage from "../pages/common/storekeeperManager/InventoryPage";
 import StockHistoryPage from "../pages/common/storekeeperManager/StockHistoryPage";
 import WarehouseMapPage from "../pages/common/storekeeperManager/WarehouseMapPage";
+import RemovalRequestList from "../components/RemovalRequestList";
 
 import AuditPage from "../pages/warehouse-manager/AuditPage";
 import CreateAuditSessionPage from "../pages/warehouse-manager/CreateAuditSessionPage";
@@ -64,6 +66,10 @@ export default function AppRouter() {
             }
           >
             <Route path={ROUTES.MEDICINE} element={<MedicinePage />} />
+            <Route
+              path={ROUTES.REMOVAL_REQUESTS}
+              element={<RemovalRequestList initialStatus="pending" />}
+            />
           </Route>
 
           <Route element={<ProtectedRoute allowedRoles={[ROLES.REQUESTER]} />}>
@@ -74,6 +80,10 @@ export default function AppRouter() {
             <Route
               path={ROUTES.MEDICINE_REQUEST_CREATE}
               element={<TakeRequestPage />}
+            />
+            <Route
+              path={ROUTES.EXPORT_CONFIRMATION}
+              element={<ExportConfirmationPanel />}
             />
             <Route path={ROUTES.RETURN_MEDICINE} element={<ReturnMedicinePage />} />
           </Route>

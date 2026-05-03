@@ -115,6 +115,25 @@ const baseTables = [
       FOREIGN KEY (batch_id) REFERENCES batches(id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
   },
+  {
+    label: "CREATE warehouse_removal_requests",
+    sql: `CREATE TABLE IF NOT EXISTS warehouse_removal_requests (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      cabinet_id VARCHAR(50) NOT NULL,
+      medicine_id INT NOT NULL,
+      quantity INT NOT NULL,
+      reason TEXT NOT NULL,
+      requested_by INT NOT NULL,
+      requester_role ENUM('manager','store') NOT NULL,
+      status ENUM('pending','completed','rejected') DEFAULT 'pending',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      completed_at TIMESTAMP NULL,
+      FOREIGN KEY (medicine_id) REFERENCES medicines(id),
+      FOREIGN KEY (requested_by) REFERENCES users(id),
+      INDEX idx_removal_status (status),
+      INDEX idx_removal_cabinet_medicine (cabinet_id, medicine_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+  },
 ];
 
 const seedStatements = [
@@ -224,12 +243,55 @@ const schemaMigrations = [
     sql: "ALTER TABLE export_requests ADD COLUMN shortage_note TEXT",
   },
   {
+    label: "UPDATE export_requests.status enum for pharmacist confirmation",
+    sql: "ALTER TABLE export_requests MODIFY COLUMN status ENUM('PENDING','APPROVED','REJECTED','COMPLETED','FAILED','SHORTAGE','confirmed_full','confirmed_partial','rejected') DEFAULT 'PENDING'",
+  },
+  {
+    label: "ADD export_requests.actual_quantity",
+    sql: "ALTER TABLE export_requests ADD COLUMN actual_quantity INT",
+  },
+  {
+    label: "ADD export_requests.rejection_reason",
+    sql: "ALTER TABLE export_requests ADD COLUMN rejection_reason TEXT",
+  },
+  {
+    label: "ADD export_requests.confirmed_by",
+    sql: "ALTER TABLE export_requests ADD COLUMN confirmed_by INT",
+  },
+  {
+    label: "ADD export_requests.confirmed_at",
+    sql: "ALTER TABLE export_requests ADD COLUMN confirmed_at TIMESTAMP NULL",
+  },
+  {
+    label: "ADD export_requests.confirmed_by foreign key",
+    run: ensureExportRequestsConfirmedByForeignKey,
+  },
+  {
     label: "ADD users.reset_token",
     sql: "ALTER TABLE users ADD COLUMN reset_token VARCHAR(255)",
   },
   {
     label: "ADD users.reset_token_exp",
     sql: "ALTER TABLE users ADD COLUMN reset_token_exp DATETIME",
+  },
+  {
+    label: "CREATE warehouse_removal_requests",
+    sql: `CREATE TABLE IF NOT EXISTS warehouse_removal_requests (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      cabinet_id VARCHAR(50) NOT NULL,
+      medicine_id INT NOT NULL,
+      quantity INT NOT NULL,
+      reason TEXT NOT NULL,
+      requested_by INT NOT NULL,
+      requester_role ENUM('manager','store') NOT NULL,
+      status ENUM('pending','completed','rejected') DEFAULT 'pending',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      completed_at TIMESTAMP NULL,
+      FOREIGN KEY (medicine_id) REFERENCES medicines(id),
+      FOREIGN KEY (requested_by) REFERENCES users(id),
+      INDEX idx_removal_status (status),
+      INDEX idx_removal_cabinet_medicine (cabinet_id, medicine_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
   },
 ];
 
@@ -287,6 +349,29 @@ async function ensureImportRequestsCreatedByForeignKey(connection) {
     `ALTER TABLE import_requests
      ADD CONSTRAINT fk_import_requests_created_by
      FOREIGN KEY (created_by) REFERENCES users(id)`,
+  );
+}
+
+async function ensureExportRequestsConfirmedByForeignKey(connection) {
+  const [constraints] = await connection.query(
+    `SELECT CONSTRAINT_NAME
+     FROM information_schema.KEY_COLUMN_USAGE
+     WHERE TABLE_SCHEMA = ?
+       AND TABLE_NAME = 'export_requests'
+       AND COLUMN_NAME = 'confirmed_by'
+       AND REFERENCED_TABLE_NAME = 'users'
+       AND REFERENCED_COLUMN_NAME = 'id'`,
+    [databaseName],
+  );
+
+  if (constraints.length > 0) {
+    return;
+  }
+
+  await connection.query(
+    `ALTER TABLE export_requests
+     ADD CONSTRAINT fk_export_requests_confirmed_by
+     FOREIGN KEY (confirmed_by) REFERENCES users(id)`,
   );
 }
 

@@ -808,7 +808,7 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
               border: "1px solid var(--outline-variant)",
               borderLeft: `5px solid ${
                 appAlert.tone === "success"
-                  ? "#059669"
+                  ? "#4CA1AF"
                   : appAlert.tone === "warning"
                     ? "#F59E0B"
                     : appAlert.tone === "error"
@@ -845,7 +845,7 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
                         : "rgba(0, 40, 142, 0.12)",
                 color:
                   appAlert.tone === "success"
-                    ? "#059669"
+                    ? "#4CA1AF"
                     : appAlert.tone === "warning"
                       ? "#B45309"
                       : appAlert.tone === "error"

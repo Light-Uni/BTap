@@ -28,6 +28,18 @@ const menu = [
     roles: [ROLES.REQUESTER],
   },
   {
+    name: "Xác nhận xuất kho",
+    path: ROUTES.EXPORT_CONFIRMATION,
+    icon: "fact_check",
+    roles: [ROLES.REQUESTER],
+  },
+  {
+    name: "Yêu cầu bỏ thuốc",
+    path: ROUTES.REMOVAL_REQUESTS,
+    icon: "delete_sweep",
+    roles: [ROLES.REQUESTER, ROLES.MANAGER],
+  },
+  {
     name: "Kho thuốc",
     path: ROUTES.INVENTORY,
     icon: "inventory_2",
@@ -69,6 +81,8 @@ export default function Sidebar() {
     [ROUTES.DASHBOARD]: t("nav.dashboard"),
     [ROUTES.MEDICINE]: t("nav.medicine"),
     [ROUTES.MEDICINE_REQUEST]: t("nav.medicineRequest"),
+    [ROUTES.EXPORT_CONFIRMATION]: "Xác nhận xuất kho",
+    [ROUTES.REMOVAL_REQUESTS]: "Yêu cầu bỏ thuốc",
     [ROUTES.INVENTORY]: t("nav.inventory"),
     [ROUTES.STOCK_HISTORY]: t("nav.stockHistory"),
     [ROUTES.STOCK_EXPORT]: t("nav.stockExport"),
@@ -125,11 +139,11 @@ export default function Sidebar() {
             </div>
             <div>
               <div
-                className="font-headline"
+                className="font-headline sidebar-brand-title"
                 style={{
                   fontWeight: 800,
                   fontSize: "1.05rem",
-                  background: "linear-gradient(135deg, #1e3a8a, #1d4ed8)",
+                  background: "linear-gradient(135deg, #2C3E50, #4CA1AF)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   lineHeight: 1.2,
@@ -137,7 +151,7 @@ export default function Sidebar() {
               >
                 {t("app.name")}
               </div>
-              <div className="text-label-sm" style={{ color: "var(--outline)", marginTop: 2 }}>
+              <div className="text-label-sm sidebar-brand-subtitle" style={{ color: "var(--outline)", marginTop: 2 }}>
                 {t("app.subtitle")}
               </div>
             </div>
@@ -211,7 +225,7 @@ export default function Sidebar() {
           style={{
             border: "none",
             width: "100%",
-            color: "var(--error)",
+            color: "#ffffff",
             justifyContent: "flex-start",
           }}
         >

@@ -83,8 +83,8 @@ export default function CreateAuditSessionPage() {
           display: "flex",
           gap: 20,
           padding: "14px 20px",
-          background: "rgba(30,64,175,0.04)",
-          border: "1px solid rgba(30,64,175,0.12)",
+          background: "rgba(76,161,175,0.04)",
+          border: "1px solid rgba(76,161,175,0.12)",
           borderRadius: 10,
           marginBottom: 20,
         }}
@@ -96,7 +96,7 @@ export default function CreateAuditSessionPage() {
         <div style={{ width: 1, background: "var(--outline-variant)" }} />
         <div>
           <span className="text-label-sm" style={{ color: "var(--on-surface-variant)" }}>Tổng chênh lệch</span>
-          <p style={{ fontWeight: 700, color: totalDiff === 0 ? "#059669" : "var(--error)" }}>
+          <p style={{ fontWeight: 700, color: totalDiff === 0 ? "#4CA1AF" : "var(--error)" }}>
             {totalDiff > 0 ? `+${totalDiff}` : totalDiff}
           </p>
         </div>
@@ -143,7 +143,7 @@ export default function CreateAuditSessionPage() {
                       style={{
                         fontWeight: 800,
                         fontSize: "0.95rem",
-                        color: diff === 0 ? "#059669" : diff > 0 ? "#F59E0B" : "var(--error)",
+                        color: diff === 0 ? "#4CA1AF" : diff > 0 ? "#F59E0B" : "var(--error)",
                       }}
                     >
                       {diff > 0 ? `+${diff}` : diff}

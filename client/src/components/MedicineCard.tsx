@@ -40,7 +40,7 @@ export default function MedicineCard({
               {/* EDIT */}
               <button
                 onClick={() => onEdit?.(medicine)}
-                className="p-1 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-600"
+                className="p-1 rounded-full bg-[#4CA1AF]/10 hover:bg-[#4CA1AF]/20 text-[#2C3E50]"
               >
                 <Pencil size={16} />
               </button>
@@ -57,7 +57,7 @@ export default function MedicineCard({
             /* 🔓 RESTORE */
             <button
               onClick={() => onRestore?.(medicine)}
-              className="p-1 rounded-full bg-green-50 hover:bg-green-100 text-green-500"
+              className="p-1 rounded-full bg-[#4CA1AF]/10 hover:bg-[#4CA1AF]/20 text-[#4CA1AF]"
             >
               <ArchiveRestore size={16} />
             </button>

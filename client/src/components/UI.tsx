@@ -127,7 +127,7 @@ export function MetricCard({
           <Icon
             name={trend.up ? "trending_up" : "trending_down"}
             size={14}
-            style={{ color: trend.up ? "#059669" : "var(--error)" }}
+            style={{ color: trend.up ? "#4CA1AF" : "var(--error)" }}
           />
           {trend.label}
         </div>

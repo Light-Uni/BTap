@@ -278,7 +278,7 @@ export default function ProfilePage() {
             </div>
 
             {profileError && <p style={{ color: "#b91c1c", fontSize: "0.82rem", margin: 0 }}>{profileError}</p>}
-            {profileMessage && <p style={{ color: "#166534", fontSize: "0.82rem", margin: 0 }}>{profileMessage}</p>}
+            {profileMessage && <p style={{ color: "#2C3E50", fontSize: "0.82rem", margin: 0 }}>{profileMessage}</p>}
 
             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 4 }}>
               <button id="btn-save-profile" className="btn btn-primary" onClick={handleSave} disabled={saving}>
@@ -348,7 +348,7 @@ export default function ProfilePage() {
             </div>
 
             {passwordError && <p style={{ color: "#b91c1c", fontSize: "0.82rem", margin: 0 }}>{passwordError}</p>}
-            {passwordMessage && <p style={{ color: "#166534", fontSize: "0.82rem", margin: 0 }}>{passwordMessage}</p>}
+            {passwordMessage && <p style={{ color: "#2C3E50", fontSize: "0.82rem", margin: 0 }}>{passwordMessage}</p>}
 
             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 4 }}>
               <button id="btn-change-password" className="btn btn-danger" onClick={handleChangePassword} disabled={changingPassword}>

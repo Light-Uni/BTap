@@ -1,9 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { PageHeader, EmptyState } from "../../../components/UI";
-import { useAppSelector } from "../../../app/hooks";
-import { getInventoryMap, setCabinetFull } from "../../../api/inventoryMapApi";
+import { getInventoryMap } from "../../../api/inventoryMapApi";
 import CabinetGrid from "../../../components/inventoryMap/CabinetGrid";
-import CabinetDetailModal from "../../../components/inventoryMap/CabinetDetailModal";
+import CabinetModal from "../../../components/CabinetModal";
 import { WAREHOUSE_FLOOR_NUMBERS, getWarehouseByFloor } from "../../../constants/warehouse";
 import type {
   MapBatchItem,
@@ -119,8 +118,6 @@ function computeStats(cabinets: CabinetInfo[]) {
 
 // ── Main Page ──────────────────────────────────────────────────────────────────
 export default function WarehouseMapPage() {
-  const userRole = useAppSelector((s) => s.auth.user?.role ?? "");
-
   const [activeFloor, setActiveFloor] = useState(1);
   const [batches,     setBatches]     = useState<MapBatchItem[]>([]);
   const [loading,     setLoading]     = useState(true);
@@ -159,26 +156,6 @@ export default function WarehouseMapPage() {
   const stats = computeStats(allCabinets);
   const selectedCabinet = selectedKey ? cabinetMap.get(selectedKey) ?? null : null;
 
-  // Toggle full status optimistically
-  const handleToggleFull = async (key: string, isFull: boolean) => {
-    // Optimistic update
-    setBatches((prev) =>
-      prev.map((b) =>
-        b.position === key ? { ...b, cabinet_is_full: isFull } : b
-      )
-    );
-    try {
-      await setCabinetFull(key, isFull);
-    } catch {
-      // Revert on error
-      setBatches((prev) =>
-        prev.map((b) =>
-          b.position === key ? { ...b, cabinet_is_full: !isFull } : b
-        )
-      );
-    }
-  };
-
   return (
     <div className="page animate-fade-in" style={{ display: "flex", flexDirection: "column", height: "100%", gap: 20 }}>
       <PageHeader
@@ -190,11 +167,11 @@ export default function WarehouseMapPage() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 12 }}>
         {[
           { label: "Tổng tủ",      value: stats.total,       color: "var(--primary)" },
-          { label: "Đang dùng",    value: stats.used,        color: "#059669" },
+          { label: "Đang dùng",    value: stats.used,        color: "#4CA1AF" },
           { label: "Cận date",     value: stats.near,        color: "#F59E0B" },
           { label: "Hết hạn",      value: stats.expired,     color: "#EF4444" },
           { label: "Trống",        value: stats.empty,       color: "var(--on-surface-variant)" },
-          { label: "Đánh dấu đầy", value: stats.full,        color: "#7C3AED" },
+          { label: "Đánh dấu đầy", value: stats.full,        color: "#2C3E50" },
         ].map((kpi) => (
           <div key={kpi.label} className="metric-card" style={{ padding: "14px 16px", textAlign: "center" }}>
             <div style={{ fontSize: "1.6rem", fontWeight: 800, color: kpi.color }}>{kpi.value}</div>
@@ -252,7 +229,7 @@ export default function WarehouseMapPage() {
             <div style={{ display: "flex", gap: 16, fontSize: "0.73rem", fontWeight: 600, color: "var(--on-surface-variant)", flexWrap: "wrap" }}>
               {[
                 { color: "var(--surface-container-high)", dashed: true, label: "Trống" },
-                { color: "#059669",  label: "Còn hạn" },
+                { color: "#4CA1AF",  label: "Còn hạn" },
                 { color: "#F59E0B",  label: "Cận date" },
                 { color: "#EF4444",  label: "Hết hạn" },
               ].map((l) => (
@@ -276,7 +253,7 @@ export default function WarehouseMapPage() {
               <span style={{ fontWeight: 700 }}>{stats.utilization}%</span>
             </div>
             <div className="progress-bar">
-              <div className="progress-fill" style={{ width: `${stats.utilization}%`, background: "#059669" }} />
+              <div className="progress-fill" style={{ width: `${stats.utilization}%`, background: "#4CA1AF" }} />
             </div>
           </div>
 
@@ -304,11 +281,11 @@ export default function WarehouseMapPage() {
 
       {/* ── Cabinet Detail Modal ── */}
       {selectedCabinet && (
-        <CabinetDetailModal
+        <CabinetModal
           cabinet={selectedCabinet}
-          userRole={userRole}
+          cabinetId={selectedCabinet.key}
           onClose={() => setSelectedKey(null)}
-          onToggleFull={handleToggleFull}
+          onRemoved={fetchData}
         />
       )}
     </div>

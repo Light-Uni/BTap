@@ -42,21 +42,21 @@ const quickActions: QuickAction[] = [
   {
     labelKey: "quick.handleExport",
     icon: "output",
-    color: "#059669",
+    color: "#4CA1AF",
     path: ROUTES.STOCK_EXPORT,
     roles: [ROLES.STOREKEEPER],
   },
   {
     labelKey: "quick.handleImport",
     icon: "input",
-    color: "#2563EB",
+    color: "#2C3E50",
     path: ROUTES.STOCK_IMPORT,
     roles: [ROLES.STOREKEEPER],
   },
   {
     labelKey: "quick.createImportNotice",
     icon: "notification_add",
-    color: "#2563EB",
+    color: "#2C3E50",
     path: `${ROUTES.INVENTORY}?action=import-request`,
     roles: [ROLES.MANAGER],
   },
@@ -225,12 +225,12 @@ export default function DashboardPage() {
                 <div className="text-label-sm" style={{ color: "var(--on-surface-variant)", marginBottom: 8 }}>
                   {t("dashboard.totalStock")}
                 </div>
-                <div className="font-headline" style={{ fontSize: "2rem", fontWeight: 800, color: "#059669", lineHeight: 1 }}>
+                <div className="font-headline" style={{ fontSize: "2rem", fontWeight: 800, color: "#4CA1AF", lineHeight: 1 }}>
                   {loading ? "-" : (summary?.totalStock ?? 0).toLocaleString("vi-VN")}
                 </div>
               </div>
-              <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(5,150,105,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <Icon name="warehouse" size={22} style={{ color: "#059669" }} />
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(76,161,175,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Icon name="warehouse" size={22} style={{ color: "#4CA1AF" }} />
               </div>
             </div>
           </div>

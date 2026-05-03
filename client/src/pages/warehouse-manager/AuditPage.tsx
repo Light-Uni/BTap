@@ -189,11 +189,11 @@ export default function StockAuditPage() {
           </div>
           <div className="metric-card" style={{ borderBottom: totalItemsDiff > 0 ? "4px solid #F59E0B" : undefined }}>
             <div className="text-label-sm" style={{ color: "var(--on-surface-variant)", marginBottom: 8 }}>Số lô lệch</div>
-            <div className="font-headline" style={{ fontSize: "2rem", fontWeight: 800, color: totalItemsDiff > 0 ? "#F59E0B" : "#059669" }}>{totalItemsDiff}</div>
+            <div className="font-headline" style={{ fontSize: "2rem", fontWeight: 800, color: totalItemsDiff > 0 ? "#F59E0B" : "#4CA1AF" }}>{totalItemsDiff}</div>
           </div>
           <div className="metric-card" style={{ borderBottom: totalDiff !== 0 ? `4px solid ${totalDiff < 0 ? "var(--error)" : "#F59E0B"}` : undefined }}>
             <div className="text-label-sm" style={{ color: "var(--on-surface-variant)", marginBottom: 8 }}>Tổng chênh lệch</div>
-            <div className="font-headline" style={{ fontSize: "2rem", fontWeight: 800, color: totalDiff < 0 ? "var(--error)" : totalDiff > 0 ? "#F59E0B" : "#059669" }}>
+            <div className="font-headline" style={{ fontSize: "2rem", fontWeight: 800, color: totalDiff < 0 ? "var(--error)" : totalDiff > 0 ? "#F59E0B" : "#4CA1AF" }}>
               {totalDiff > 0 ? `+${totalDiff}` : totalDiff}
             </div>
           </div>
@@ -238,7 +238,7 @@ export default function StockAuditPage() {
                       style={{
                         fontWeight: 800,
                         fontSize: "0.95rem",
-                        color: diff === 0 ? "#059669" : diff > 0 ? "#F59E0B" : "var(--error)",
+                        color: diff === 0 ? "#4CA1AF" : diff > 0 ? "#F59E0B" : "var(--error)",
                       }}
                     >
                       {diff > 0 ? `+${diff}` : diff}

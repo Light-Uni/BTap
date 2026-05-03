@@ -222,7 +222,7 @@ export default function ExportPage() {
                   borderRadius: 10,
                   cursor: "pointer",
                   border: `1px solid ${selectedId === r.id ? "var(--primary-container)" : "var(--outline-variant)"}`,
-                  background: selectedId === r.id ? "rgba(30,64,175,0.06)" : "var(--surface-container-lowest)",
+                  background: selectedId === r.id ? "rgba(76,161,175,0.06)" : "var(--surface-container-lowest)",
                   transition: "all 0.15s",
                 }}
               >
@@ -267,7 +267,7 @@ export default function ExportPage() {
             </div>
 
             {/* FEFO label */}
-            <div style={{ padding: "8px 16px", background: "rgba(30,64,175,0.04)", borderBottom: "1px solid var(--outline-variant)", display: "flex", alignItems: "center", gap: 6 }}>
+            <div style={{ padding: "8px 16px", background: "rgba(76,161,175,0.04)", borderBottom: "1px solid var(--outline-variant)", display: "flex", alignItems: "center", gap: 6 }}>
               <Icon name="schedule" size={14} style={{ color: "var(--primary)" }} />
               <span style={{ fontSize: "0.75rem", color: "var(--primary)", fontWeight: 600 }}>Sắp xếp FEFO (hạn gần nhất ưu tiên)</span>
             </div>

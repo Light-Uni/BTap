@@ -21,13 +21,13 @@ export default function Stat({
       <p
         className={`text-xl font-bold ${
           blue
-            ? "text-blue-600"
+            ? "text-[#2C3E50]"
             : amber
               ? "text-amber-500"
               : red
                 ? "text-red-500"
                 : green
-                  ? "text-green-400"
+                  ? "text-[#4CA1AF]"
                   : ""
         }`}
       >

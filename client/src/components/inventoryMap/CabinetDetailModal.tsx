@@ -18,7 +18,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 const STATUS_COLOR: Record<string, string> = {
-  safe: "#059669",
+  safe: "#4CA1AF",
   near: "#F59E0B",
   expired: "#EF4444",
   empty: "#9CA3AF",
@@ -254,7 +254,7 @@ export default function CabinetDetailModal({
                 cursor: "pointer",
                 fontWeight: 700,
                 fontSize: "0.85rem",
-                background: cabinet.isFull ? "#EF4444" : "#059669",
+                background: cabinet.isFull ? "#EF4444" : "#4CA1AF",
                 color: "#fff",
                 opacity: loading ? 0.6 : 1,
                 transition: "all 0.15s",

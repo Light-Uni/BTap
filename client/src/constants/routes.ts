@@ -16,11 +16,13 @@ export const ROUTES = {
   STOCK_IMPORT: "/stock-import",
   STOCK_EXPORT: "/stock-export",
   STOCK_HISTORY: "/stock-history",
+  REMOVAL_REQUESTS: "/warehouse/removal-requests",
 
   /* ================= PHARMACIST ================= */
   MEDICINE: "/medicine",
   MEDICINE_REQUEST: "/medicine-request",
   MEDICINE_REQUEST_CREATE: "/medicine-request/create",
+  EXPORT_CONFIRMATION: "/export-confirmation",
 
   /* ================= AUDIT ================= */
   AUDIT: "/audit",

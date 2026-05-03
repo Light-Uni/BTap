@@ -67,8 +67,8 @@ export default function TakeMedicinePage() {
             display: "flex",
             alignItems: "center",
             gap: 8,
-            background: "rgba(30,64,175,0.06)",
-            border: "1px solid rgba(30,64,175,0.15)",
+            background: "rgba(76,161,175,0.06)",
+            border: "1px solid rgba(76,161,175,0.15)",
             borderRadius: 10,
             padding: "10px 18px",
           }}
