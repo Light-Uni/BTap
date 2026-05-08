@@ -3,12 +3,12 @@ require("dotenv").config({ quiet: true });
 const mysql = require("mysql2/promise");
 const db = require("./config/db");
 
-const databaseName = process.env.DB_NAME || process.env.MYSQLDATABASE || "pharmacy_db";
+const databaseName = process.env.MYSQLDATABASE || process.env.DB_NAME || "pharmacy_db";
 const databaseConfig = {
-  host: process.env.DB_HOST || process.env.MYSQLHOST || "localhost",
-  user: process.env.DB_USER || process.env.MYSQLUSER || "root",
-  password: process.env.DB_PASSWORD || process.env.MYSQLPASSWORD || "",
-  port: Number(process.env.DB_PORT || process.env.MYSQLPORT || 3306),
+  host: process.env.MYSQLHOST || process.env.DB_HOST || "localhost",
+  user: process.env.MYSQLUSER || process.env.DB_USER || "root",
+  password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || "",
+  port: Number(process.env.MYSQLPORT || process.env.DB_PORT || 3306),
 };
 
 const baseTables = [
