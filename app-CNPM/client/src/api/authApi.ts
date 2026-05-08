@@ -4,8 +4,9 @@ import type {
   RegisterRequest,
   AuthResponse,
 } from "../types/auth";
+import { API_BASE_URL } from "../constants/api";
 
-const API_URL = "http://localhost:3000/api/auth";
+const API_URL = `${API_BASE_URL}/auth`;
 
 // =============================
 // LOGIN

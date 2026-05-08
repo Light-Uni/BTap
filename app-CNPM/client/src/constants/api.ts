@@ -1,13 +1,10 @@
-// export const API_BASE_URL = "http://localhost:3000";
+export const API_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-// export const API_ROUTES = {
-//   AUTH: {
-//     LOGIN: "/api/auth/login",
-//     REGISTER: "/api/auth/register",
-//     FORGOT_PASSWORD: "/api/auth/forgot-password",
-//   },
+export const API_BASE_URL = `${API_URL}/api`;
 
-//   USER: {
-//     ME: "/api/auth/me",
-//   },
-// };
+export const resolveAssetUrl = (path?: string | null) => {
+  if (!path) return "";
+  if (/^https?:\/\//i.test(path)) return path;
+  return `${API_URL}${path.startsWith("/") ? path : `/${path}`}`;
+};

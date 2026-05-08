@@ -1,7 +1,8 @@
 import axios from "axios";
 import type { MapBatchItem } from "../types/inventoryMap";
+import { API_BASE_URL } from "../constants/api";
 
-const BASE = "http://localhost:3000/api/inventory";
+const BASE = `${API_BASE_URL}/inventory`;
 
 function getHeaders() {
   const token = localStorage.getItem("token");

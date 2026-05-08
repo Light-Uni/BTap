@@ -3,9 +3,9 @@ const nodemailer = require("nodemailer");
 const mailConfig = {
   host: process.env.MAIL_HOST || "smtp.gmail.com",
   port: Number(process.env.MAIL_PORT || 587),
-  user: process.env.MAIL_USERNAME,
-  pass: process.env.MAIL_PASSWORD,
-  fromEmail: process.env.MAIL_FROM_EMAIL || process.env.MAIL_USERNAME,
+  user: process.env.EMAIL_USER || process.env.MAIL_USERNAME,
+  pass: process.env.EMAIL_PASS || process.env.MAIL_PASSWORD,
+  fromEmail: process.env.MAIL_FROM_EMAIL || process.env.EMAIL_USER || process.env.MAIL_USERNAME,
   fromName: process.env.MAIL_FROM_NAME || "1102 POS",
 };
 
@@ -23,7 +23,7 @@ const getFromAddress = () => `"${mailConfig.fromName}" <${mailConfig.fromEmail}>
 
 const ensureMailConfig = () => {
   if (!mailConfig.user || !mailConfig.pass || !mailConfig.fromEmail) {
-    throw new Error("Missing mail config. Please set MAIL_USERNAME, MAIL_PASSWORD, and MAIL_FROM_EMAIL.");
+    throw new Error("Missing mail config. Please set EMAIL_USER and EMAIL_PASS.");
   }
 };
 

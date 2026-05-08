@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Icon, EmptyState } from "./UI";
+import { API_BASE_URL } from "../constants/api";
 
-const API_BASE = "http://localhost:3000/api";
+const API_BASE = API_BASE_URL;
 
 function getHeaders() {
   const token = localStorage.getItem("token");

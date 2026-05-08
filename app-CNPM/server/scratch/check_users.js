@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("dotenv").config({ quiet: true });
 const db = require('../config/db');
 async function check() {
   try {

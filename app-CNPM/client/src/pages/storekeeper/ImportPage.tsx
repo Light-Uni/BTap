@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from "react";
 import { PageHeader, MetricCard, StatusPill, Icon, EmptyState } from "../../components/UI";
 import { getImportRequests, receiveImportRequest, rejectImportRequest } from "../../api/medicineRequestApi";
 import { getInventoryMap } from "../../api/inventoryMapApi";
-import { WAREHOUSE_FLOORS, getWarehouseByFloor } from "../../constants/warehouse";
+import { WAREHOUSE_FLOORS } from "../../constants/warehouse";
 
 /* ─── Giữ nguyên types ─── */
 type RequestSource = "manager" | "requestor";
@@ -82,8 +82,6 @@ export default function ImportRequestPage() {
     pending: requests.filter((r) => r.status === "pending").length,
     processed: requests.filter((r) => r.status === "processed").length,
   }), [requests]);
-  const selectedPosition = `F${floor}-${room}-${cabinet}`;
-
   const handleReject = async () => {
     if (!selected) return;
     if (!rejectNote.trim()) {

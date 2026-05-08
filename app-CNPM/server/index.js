@@ -1,6 +1,8 @@
-require("dotenv").config();
+require("dotenv").config({ quiet: true });
 const express = require("express");
 const cors = require("cors");
+const fs = require("fs");
+const path = require("path");
 const { runSetup } = require("./schema");
 
 const auth = require("./middlewares/authMiddleware");
@@ -20,13 +22,19 @@ const reportRoutes = require("./routes/reports.routes");
 const disposalRoutes = require("./routes/disposal.routes");
 
 const app = express();
+const uploadsPath = path.join(__dirname, "assets", "uploads");
 
-app.use(cors());
+fs.mkdirSync(uploadsPath, { recursive: true });
+
+app.use(cors({
+  origin: process.env.CLIENT_URL || "http://localhost:5173",
+  credentials: true,
+}));
 app.use(express.json());
 
 // Public routes
 app.use("/api/auth", authRoutes);
-app.use("/uploads", express.static("assets/uploads"));
+app.use("/uploads", express.static(uploadsPath));
 
 // Protected routes
 app.use("/api/medicines", auth, medicineRoutes);
@@ -53,6 +61,11 @@ runSetup()
     });
   })
   .catch((err) => {
-    console.error("Server startup failed:", err.message);
+    console.error("Server startup failed:", {
+      message: err.message,
+      code: err.code,
+      errno: err.errno,
+      sqlState: err.sqlState,
+    });
     process.exit(1);
   });

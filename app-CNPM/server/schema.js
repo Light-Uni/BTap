@@ -1,9 +1,15 @@
-require("dotenv").config();
+require("dotenv").config({ quiet: true });
 
 const mysql = require("mysql2/promise");
 const db = require("./config/db");
 
-const databaseName = process.env.DB_NAME || "pharmacy_db";
+const databaseName = process.env.DB_NAME || process.env.MYSQLDATABASE || "pharmacy_db";
+const databaseConfig = {
+  host: process.env.DB_HOST || process.env.MYSQLHOST || "localhost",
+  user: process.env.DB_USER || process.env.MYSQLUSER || "root",
+  password: process.env.DB_PASSWORD || process.env.MYSQLPASSWORD || "",
+  port: Number(process.env.DB_PORT || process.env.MYSQLPORT || 3306),
+};
 
 const baseTables = [
   {
@@ -341,9 +347,7 @@ async function createDatabaseIfMissing() {
   }
 
   const conn = await mysql.createConnection({
-    host: process.env.DB_HOST || "localhost",
-    user: process.env.DB_USER || "root",
-    password: process.env.DB_PASSWORD || "",
+    ...databaseConfig,
   });
 
   try {
@@ -405,9 +409,7 @@ async function seedInitialData(connection) {
 
 async function createSchemaConnection() {
   return mysql.createConnection({
-    host: process.env.DB_HOST || "localhost",
-    user: process.env.DB_USER || "root",
-    password: process.env.DB_PASSWORD || "",
+    ...databaseConfig,
     database: databaseName,
     multipleStatements: true,
   });

@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../../../app/store";
 import { ROLES } from "../../../constants/role";
 import { toast } from "react-toastify";
+import { API_BASE_URL } from "../../../constants/api";
 
 /* ─── Giữ nguyên types ─── */
 type HistoryItem = {
@@ -42,7 +43,7 @@ export default function StockHistoryPage() {
     setLoading(true);
     try {
       if (tab === "DISPOSE") {
-        const res = await axios.get("http://localhost:3000/api/disposals/history", {
+        const res = await axios.get(`${API_BASE_URL}/disposals/history`, {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
         });
         const mapped: HistoryItem[] = res.data.map((d: any) => ({

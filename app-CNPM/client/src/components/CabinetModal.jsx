@@ -5,8 +5,9 @@ import { useSelector } from "react-redux";
 import { Icon } from "./UI";
 import { setCabinetFull, moveMedicine, adjustMedicine } from "../api/inventoryMapApi";
 import { WAREHOUSE_FLOORS } from "../constants/warehouse";
+import { API_BASE_URL } from "../constants/api";
 
-const API_BASE = "http://localhost:3000/api";
+const API_BASE = API_BASE_URL;
 
 function getHeaders() {
   const token = localStorage.getItem("token");

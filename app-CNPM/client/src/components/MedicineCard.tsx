@@ -1,5 +1,6 @@
 import { X, Pencil, ArchiveRestore } from "lucide-react";
 import type { Medicine } from "../types/medicine";
+import { resolveAssetUrl } from "../constants/api";
 
 type Props = {
   medicine: Medicine;
@@ -8,8 +9,6 @@ type Props = {
   onDelete?: (medicine: Medicine) => void;
   onRestore?: (medicine: Medicine) => void;
 };
-
-const BASE_URL = "http://localhost:3000";
 
 export default function MedicineCard({
   medicine,
@@ -69,7 +68,7 @@ export default function MedicineCard({
         }`}
       >
         <img
-          src={`${BASE_URL}${medicine.img_path}`}
+          src={resolveAssetUrl(medicine.img_path)}
           alt={medicine.name}
           className="flex-1 max-h-35 max-w-full object-contain mt-3"
         />

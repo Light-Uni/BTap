@@ -1,6 +1,7 @@
 import axios from "axios";
+import { API_BASE_URL } from "../constants/api";
 
-const BASE = "http://localhost:3000/api";
+const BASE = API_BASE_URL;
 
 function getHeaders() {
   const token = localStorage.getItem("token");
