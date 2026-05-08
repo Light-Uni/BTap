@@ -13,8 +13,8 @@ Cần có:
 - Tài khoản Railway
 - Repository đã push lên GitHub
 - 3 service trên Railway:
-  - Frontend service, root directory: `client`
-  - Backend service, root directory: `server`
+  - Frontend service, root directory: `app-CNPM/client`
+  - Backend service, root directory: `app-CNPM/server`
   - MySQL service
 
 Không commit các file chứa secret như `.env`, JWT secret, email password hoặc database credentials.
@@ -44,13 +44,13 @@ Các biến này sẽ được copy hoặc reference sang backend service.
 3. Set root directory là:
 
 ```bash
-server
+app-CNPM/server
 ```
 
 4. Railway sẽ dùng file:
 
 ```bash
-server/railway.json
+app-CNPM/server/railway.json
 ```
 
 Nếu cần cấu hình thủ công:
@@ -91,13 +91,13 @@ Backend sẽ tự chạy schema setup/migration khi start.
 3. Set root directory là:
 
 ```bash
-client
+app-CNPM/client
 ```
 
 4. Railway sẽ dùng file:
 
 ```bash
-client/railway.json
+app-CNPM/client/railway.json
 ```
 
 Nếu cần cấu hình thủ công:

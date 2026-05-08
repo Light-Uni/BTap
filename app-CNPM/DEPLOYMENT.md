@@ -2,8 +2,8 @@
 
 Architecture:
 
-- Frontend React Vite: Railway service with root directory `client`
-- Backend Express Node.js: Railway service with root directory `server`
+- Frontend React Vite: Railway service with root directory `app-CNPM/client`
+- Backend Express Node.js: Railway service with root directory `app-CNPM/server`
 - Database MySQL: Railway MySQL service
 
 ## 1. Railway MySQL
@@ -25,7 +25,7 @@ Architecture:
 ## 2. Railway Backend
 
 1. Create a Railway service from this repository.
-2. Set the service root directory to `server`.
+2. Set the service root directory to `app-CNPM/server`.
 3. Use the included `server/railway.json`, or set build command:
    ```bash
    npm install
@@ -48,7 +48,7 @@ Architecture:
 ## 3. Railway Frontend
 
 1. Create another Railway service from this repository.
-2. Set the project root directory to `client`.
+2. Set the project root directory to `app-CNPM/client`.
 3. Use the included `client/railway.json`, or set build command:
    ```bash
    npm install && npm run build
