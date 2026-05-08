@@ -23,8 +23,22 @@ const disposalRoutes = require("./routes/disposal.routes");
 
 const app = express();
 const uploadsPath = path.join(__dirname, "assets", "uploads");
+const seedUploadsPath = path.join(__dirname, "assets", "seed-uploads");
 
 fs.mkdirSync(uploadsPath, { recursive: true });
+
+if (fs.existsSync(seedUploadsPath)) {
+  for (const entry of fs.readdirSync(seedUploadsPath, { withFileTypes: true })) {
+    if (!entry.isFile()) continue;
+
+    const sourcePath = path.join(seedUploadsPath, entry.name);
+    const targetPath = path.join(uploadsPath, entry.name);
+
+    if (!fs.existsSync(targetPath)) {
+      fs.copyFileSync(sourcePath, targetPath);
+    }
+  }
+}
 
 app.use(cors({
   origin: process.env.CLIENT_URL || "http://localhost:5173",
