@@ -1228,6 +1228,98 @@ select.wms-input option {
   color: var(--on-surface-variant);
 }
 
+/* Profile page contrast */
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 24px;
+}
+
+.profile-card {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.085), rgba(255,255,255,0.06)),
+    rgba(255,255,255,0.07);
+  border-color: rgba(139,227,240,0.18);
+}
+
+.profile-card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(139,227,240,0.16);
+}
+
+.profile-card-header--compact {
+  gap: 12px;
+  margin-bottom: 22px;
+  padding-bottom: 18px;
+}
+
+.profile-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 18px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #5ab7c5 0%, #326579 100%);
+  border: 1px solid rgba(139,227,240,0.35);
+  box-shadow: 0 16px 34px rgba(76,161,175,0.22);
+}
+
+.profile-avatar span {
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 1.35rem;
+}
+
+.profile-danger-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(251,113,133,0.16);
+  border: 1px solid rgba(251,113,133,0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:root[data-theme="dark"] .profile-page .wms-form input,
+:root[data-theme="dark"] .profile-page .wms-form select,
+:root[data-theme="dark"] .profile-page .wms-form textarea {
+  background: rgba(255,255,255,0.085);
+  border-color: rgba(139,227,240,0.18);
+}
+
+:root[data-theme="dark"] .profile-page .wms-form input:disabled {
+  opacity: 1;
+  background: rgba(139,227,240,0.08);
+  border-color: rgba(139,227,240,0.16);
+  color: rgba(244,251,252,0.72);
+}
+
+:root[data-theme="dark"] .profile-page .btn-danger {
+  background: rgba(251,113,133,0.22);
+  border: 1px solid rgba(251,113,133,0.3);
+  color: #ffe4e6;
+}
+
+:root[data-theme="dark"] .profile-page .btn-danger:hover:not(:disabled) {
+  background: rgba(251,113,133,0.32);
+}
+
+:root[data-theme="dark"] .role-REQUESTER,
+:root[data-theme="dark"] .role-STOREKEEPER,
+:root[data-theme="dark"] .role-MANAGER,
+:root[data-theme="dark"] .role-requestor {
+  background: rgba(139,227,240,0.14);
+  border: 1px solid rgba(139,227,240,0.24);
+  color: #c8f7ff;
+}
+
 :root:not([data-theme="dark"]) .app-layout {
   --primary: #2C3E50;
   --primary-container: #4CA1AF;
@@ -1405,6 +1497,20 @@ select.wms-input option {
 :root:not([data-theme="dark"]) .medicine-card-media {
   background: rgba(76,161,175,0.06);
   border-color: rgba(44,62,80,0.08);
+}
+
+:root:not([data-theme="dark"]) .profile-card {
+  background: rgba(255,255,255,0.94);
+  border-color: rgba(44,62,80,0.1);
+}
+
+:root:not([data-theme="dark"]) .profile-card-header {
+  border-bottom-color: rgba(44,62,80,0.1);
+}
+
+:root:not([data-theme="dark"]) .profile-danger-icon {
+  background: rgba(186,26,26,0.08);
+  border-color: rgba(186,26,26,0.14);
 }
 
 /* Responsive */

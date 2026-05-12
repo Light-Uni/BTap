@@ -7,6 +7,7 @@ import {
   updateProfile,
   type UserProfileResponse,
 } from "../../api/userApi";
+import { usePreferences } from "../../app/preferences";
 
 type ProfileForm = {
   name: string;
@@ -24,12 +25,6 @@ const emptyForm: ProfileForm = {
   role: "REQUESTER",
 };
 
-const ROLE_LABEL: Record<UserProfileResponse["role"], string> = {
-  REQUESTER: "Trình dược viên",
-  STOREKEEPER: "Thủ kho",
-  MANAGER: "Quản lý kho",
-};
-
 const getErrorMessage = (err: unknown, fallback: string) => {
   if (axios.isAxiosError(err)) {
     return err.response?.data?.message || fallback;
@@ -39,6 +34,7 @@ const getErrorMessage = (err: unknown, fallback: string) => {
 };
 
 export default function ProfilePage() {
+  const { t } = usePreferences();
   const [form, setForm] = useState<ProfileForm>(emptyForm);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -179,33 +175,41 @@ export default function ProfilePage() {
     );
   }, [form.name]);
 
+  const roleLabel = useMemo<Record<UserProfileResponse["role"], string>>(
+    () => ({
+      REQUESTER: t("role.requester"),
+      STOREKEEPER: t("role.storekeeper"),
+      MANAGER: t("role.manager"),
+    }),
+    [t],
+  );
+
   if (loading) {
     return (
-      <div className="page animate-fade-in">
+      <div className="page profile-page animate-fade-in">
         <PageHeader title="Thông tin cá nhân" subtitle="Xem và cập nhật thông tin tài khoản" />
-        <div className="metric-card">Đang tải thông tin...</div>
+        <div className="metric-card profile-card">Đang tải thông tin...</div>
       </div>
     );
   }
 
   return (
-    <div className="page animate-fade-in">
+    <div className="page profile-page animate-fade-in">
       <PageHeader title="Thông tin cá nhân" subtitle="Xem và cập nhật thông tin tài khoản" />
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
-        <div className="metric-card">
-          <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24, paddingBottom: 20, borderBottom: "1px solid var(--outline-variant)" }}>
+      <div className="profile-grid">
+        <div className="metric-card profile-card">
+          <div className="profile-card-header">
             <div
-              className="sig-gradient"
-              style={{ width: 60, height: 60, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
+              className="profile-avatar"
             >
-              <span className="font-headline" style={{ color: "#fff", fontWeight: 800, fontSize: "1.4rem" }}>
+              <span className="font-headline">
                 {initials}
               </span>
             </div>
             <div>
               <div style={{ fontWeight: 700, fontSize: "1rem", color: "var(--on-surface)" }}>{form.name}</div>
-              <span className={`role-badge role-${form.role}`}>{ROLE_LABEL[form.role]}</span>
+              <span className={`role-badge role-${form.role}`}>{roleLabel[form.role]}</span>
             </div>
           </div>
 
@@ -258,8 +262,7 @@ export default function ProfilePage() {
               <input
                 id="profile-role"
                 disabled
-                value={ROLE_LABEL[form.role]}
-                style={{ opacity: 0.6 }}
+                value={roleLabel[form.role]}
               />
             </div>
 
@@ -277,8 +280,8 @@ export default function ProfilePage() {
               />
             </div>
 
-            {profileError && <p style={{ color: "#b91c1c", fontSize: "0.82rem", margin: 0 }}>{profileError}</p>}
-            {profileMessage && <p style={{ color: "#2C3E50", fontSize: "0.82rem", margin: 0 }}>{profileMessage}</p>}
+            {profileError && <p style={{ color: "var(--error)", fontSize: "0.82rem", margin: 0 }}>{profileError}</p>}
+            {profileMessage && <p style={{ color: "var(--secondary)", fontSize: "0.82rem", margin: 0 }}>{profileMessage}</p>}
 
             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 4 }}>
               <button id="btn-save-profile" className="btn btn-primary" onClick={handleSave} disabled={saving}>
@@ -288,10 +291,10 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <div className="metric-card">
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20, paddingBottom: 16, borderBottom: "1px solid var(--outline-variant)" }}>
+        <div className="metric-card profile-card">
+          <div className="profile-card-header profile-card-header--compact">
             <div
-              style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(186,26,26,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}
+              className="profile-danger-icon"
             >
               <Icon name="lock" size={20} style={{ color: "var(--error)" }} />
             </div>
@@ -347,8 +350,8 @@ export default function ProfilePage() {
               />
             </div>
 
-            {passwordError && <p style={{ color: "#b91c1c", fontSize: "0.82rem", margin: 0 }}>{passwordError}</p>}
-            {passwordMessage && <p style={{ color: "#2C3E50", fontSize: "0.82rem", margin: 0 }}>{passwordMessage}</p>}
+            {passwordError && <p style={{ color: "var(--error)", fontSize: "0.82rem", margin: 0 }}>{passwordError}</p>}
+            {passwordMessage && <p style={{ color: "var(--secondary)", fontSize: "0.82rem", margin: 0 }}>{passwordMessage}</p>}
 
             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 4 }}>
               <button id="btn-change-password" className="btn btn-danger" onClick={handleChangePassword} disabled={changingPassword}>
