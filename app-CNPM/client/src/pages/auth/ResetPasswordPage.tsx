@@ -2,8 +2,10 @@ import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { resetPassword } from "../../api/authApi";
 import { Icon } from "../../components/UI";
+import { usePreferences } from "../../app/preferences";
 
 export default function ResetPasswordPage() {
+  const { t } = usePreferences();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token") || "";
 
@@ -17,17 +19,17 @@ export default function ResetPasswordPage() {
     e.preventDefault();
 
     if (!token) {
-      setError("Liên kết đặt lại mật khẩu không hợp lệ.");
+      setError(t("auth.resetInvalidLink"));
       return;
     }
 
     if (!password || !confirmPassword) {
-      setError("Vui lòng nhập đầy đủ mật khẩu mới.");
+      setError(t("auth.resetRequired"));
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Mật khẩu xác nhận không khớp.");
+      setError(t("auth.resetMismatch"));
       return;
     }
 
@@ -40,7 +42,7 @@ export default function ResetPasswordPage() {
       setPassword("");
       setConfirmPassword("");
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Không thể đặt lại mật khẩu. Vui lòng yêu cầu gửi lại email mới.");
+      setError(err?.response?.data?.message || t("auth.resetError"));
     } finally {
       setLoading(false);
     }
@@ -50,14 +52,14 @@ export default function ResetPasswordPage() {
     <div className="auth-flip-wrapper animate-fade-in">
       <div className="auth-simple-card">
         <Link className="auth-flip-link auth-simple-back-link" to="/login">
-          <Icon name="arrow_back" size={16} /> Quay lại đăng nhập
+          <Icon name="arrow_back" size={16} /> {t("auth.backToLogin")}
         </Link>
 
         {!done ? (
           <>
-            <div className="auth-flip-title">Đặt lại mật khẩu</div>
+            <div className="auth-flip-title">{t("auth.resetTitle")}</div>
             <p className="auth-simple-copy">
-              Nhập mật khẩu mới cho tài khoản của bạn.
+              {t("auth.resetCopy")}
             </p>
 
             <form className="auth-flip-form" onSubmit={handleSubmit}>
@@ -66,7 +68,7 @@ export default function ResetPasswordPage() {
                 className="auth-flip-input"
                 name="password"
                 type="password"
-                placeholder="Mật khẩu mới"
+                placeholder={t("auth.newPassword")}
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
@@ -79,7 +81,7 @@ export default function ResetPasswordPage() {
                 className="auth-flip-input"
                 name="confirmPassword"
                 type="password"
-                placeholder="Xác nhận mật khẩu"
+                placeholder={t("auth.confirmPassword")}
                 value={confirmPassword}
                 onChange={(e) => {
                   setConfirmPassword(e.target.value);
@@ -101,19 +103,19 @@ export default function ResetPasswordPage() {
                 className="auth-flip-btn"
                 disabled={loading}
               >
-                {loading ? "Đang cập nhật..." : "Cập nhật mật khẩu"}
+                {loading ? t("auth.resetLoading") : t("auth.resetSubmit")}
               </button>
             </form>
           </>
         ) : (
           <div className="auth-simple-success">
             <Icon name="check_circle" size={42} style={{ color: "var(--auth-main-color)" }} />
-            <div className="auth-flip-title">Đã cập nhật</div>
+            <div className="auth-flip-title">{t("auth.resetDoneTitle")}</div>
             <p className="auth-simple-copy">
-              Bạn có thể đăng nhập bằng mật khẩu mới.
+              {t("auth.resetDoneCopy")}
             </p>
             <Link className="auth-flip-btn" to="/login" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
-              Đăng nhập
+              {t("auth.login")}
             </Link>
           </div>
         )}

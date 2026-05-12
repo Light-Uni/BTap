@@ -16,20 +16,22 @@ export default function Stat({
   green,
 }: StatProps) {
   return (
-    <div className="bg-white p-4 rounded-xl border">
-      <p className="text-xs text-gray-400">{title}</p>
+    <div className="metric-card" style={{ padding: 16, borderRadius: 12 }}>
+      <p style={{ fontSize: "0.75rem", color: "var(--on-surface-variant)" }}>{title}</p>
       <p
-        className={`text-xl font-bold ${
-          blue
-            ? "text-[#2C3E50]"
+        style={{
+          fontSize: "1.25rem",
+          fontWeight: 800,
+          color: blue
+            ? "var(--primary)"
             : amber
-              ? "text-amber-500"
+              ? "var(--warning)"
               : red
-                ? "text-red-500"
+                ? "var(--error)"
                 : green
-                  ? "text-[#4CA1AF]"
-                  : ""
-        }`}
+                  ? "var(--secondary)"
+                  : "var(--on-surface)",
+        }}
       >
         {value}
       </p>

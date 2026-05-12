@@ -183,7 +183,7 @@ export default function AuthLayout() {
             {/* Close button */}
             <button
               onClick={() => setShowModal(false)}
-              aria-label="Đóng"
+              aria-label={t("common.close")}
               style={{
                 position: "absolute",
                 top: 14,

@@ -1,4 +1,5 @@
 import type { Medicine } from "../types/medicine";
+import { usePreferences } from "../app/preferences";
 
 interface Props {
   products: Medicine[];
@@ -7,20 +8,21 @@ interface Props {
 }
 
 export default function ProductSelector({ products, value, onChange }: Props) {
+  const { language } = usePreferences();
+
   return (
-    <div className="flex flex-col gap-1.5">
-      <label className="text-xs font-medium text-slate-500 uppercase">
-        Loại thuốc
+    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      <label className="text-label-sm" style={{ color: "var(--on-surface-variant)" }}>
+        {language === "en" ? "Medicine type" : "Loại thuốc"}
       </label>
 
       <select
-        value={value ?? ""} // 👈 tránh warning React
+        value={value ?? ""}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="h-10 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm"
+        className="wms-input"
       >
-        {/* placeholder */}
         <option value="" disabled>
-          -- Chọn thuốc --
+          {language === "en" ? "-- Select medicine --" : "-- Chọn thuốc --"}
         </option>
 
         {products.map((p) => (

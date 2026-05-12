@@ -67,11 +67,13 @@ export default function MedicineCard({
           medicine.is_deleted ? "grayscale opacity-60" : ""
         }`}
       >
-        <img
-          src={resolveAssetUrl(medicine.img_path)}
-          alt={medicine.name}
-          className="flex-1 max-h-35 max-w-full object-contain mt-3"
-        />
+        <div className="medicine-card-media">
+          <img
+            src={resolveAssetUrl(medicine.img_path)}
+            alt={medicine.name}
+            className="medicine-card-img"
+          />
+        </div>
 
         <div className="p-3 text-center">
           <h2 className="medicine-card-title text-lg font-semibold">

@@ -3,7 +3,7 @@ import { Provider } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { store } from "./store";
-import { PreferencesProvider } from "./preferences";
+import { PreferencesProvider, usePreferences } from "./preferences";
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -14,8 +14,20 @@ export default function Providers({ children }: ProvidersProps) {
     <Provider store={store}>
       <PreferencesProvider>
         <BrowserRouter>{children}</BrowserRouter>
-        <ToastContainer position="top-right" autoClose={2500} />
+        <AppToastContainer />
       </PreferencesProvider>
     </Provider>
+  );
+}
+
+function AppToastContainer() {
+  const { theme } = usePreferences();
+
+  return (
+    <ToastContainer
+      position="top-right"
+      autoClose={2500}
+      theme={theme}
+    />
   );
 }

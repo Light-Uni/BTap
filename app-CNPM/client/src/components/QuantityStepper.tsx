@@ -5,11 +5,12 @@ interface Props {
 
 export default function QuantityStepper({ value, onChange }: Props) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="quantity-stepper">
       <button
         type="button"
         onClick={() => onChange(Math.max(1, value - 1))}
-        className="h-10 w-10 rounded-lg bg-slate-50 border border-slate-200"
+        className="btn btn-secondary quantity-stepper-btn"
+        aria-label="Decrease quantity"
       >
         −
       </button>
@@ -19,13 +20,14 @@ export default function QuantityStepper({ value, onChange }: Props) {
         value={value}
         min={1}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="h-10 flex-1 rounded-lg bg-slate-50 text-center border border-slate-200"
+        className="wms-input quantity-stepper-input"
       />
 
       <button
         type="button"
         onClick={() => onChange(value + 1)}
-        className="h-10 w-10 rounded-lg bg-slate-50 border border-slate-200"
+        className="btn btn-secondary quantity-stepper-btn"
+        aria-label="Increase quantity"
       >
         +
       </button>

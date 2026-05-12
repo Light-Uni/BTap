@@ -2,8 +2,10 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { forgotPassword } from "../../api/authApi";
 import { Icon } from "../../components/UI";
+import { usePreferences } from "../../app/preferences";
 
 export default function ForgotPasswordPage() {
+  const { t } = usePreferences();
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -22,7 +24,7 @@ export default function ForgotPasswordPage() {
       setEmail(trimmedEmail);
       setSent(true);
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Không thể gửi email đặt lại mật khẩu.");
+      setError(err?.response?.data?.message || t("auth.forgotError"));
     } finally {
       setLoading(false);
     }
@@ -32,14 +34,14 @@ export default function ForgotPasswordPage() {
     <div className="auth-flip-wrapper animate-fade-in">
       <div className="auth-simple-card">
         <Link className="auth-flip-link auth-simple-back-link" to="/login">
-          <Icon name="arrow_back" size={16} /> Quay lại đăng nhập
+          <Icon name="arrow_back" size={16} /> {t("auth.backToLogin")}
         </Link>
 
         {!sent ? (
           <>
-            <div className="auth-flip-title">Quên mật khẩu</div>
+            <div className="auth-flip-title">{t("auth.forgotTitle")}</div>
             <p className="auth-simple-copy">
-              Nhập email của bạn để nhận liên kết đặt lại mật khẩu.
+              {t("auth.forgotCopy")}
             </p>
 
             <form className="auth-flip-form" onSubmit={handleSubmit}>
@@ -70,16 +72,16 @@ export default function ForgotPasswordPage() {
                 className="auth-flip-btn"
                 disabled={loading}
               >
-                {loading ? "Đang gửi..." : "Gửi liên kết"}
+                {loading ? t("auth.forgotLoading") : t("auth.forgotSubmit")}
               </button>
             </form>
           </>
         ) : (
           <div className="auth-simple-success">
             <Icon name="mark_email_read" size={42} style={{ color: "var(--auth-main-color)" }} />
-            <div className="auth-flip-title">Đã gửi email</div>
+            <div className="auth-flip-title">{t("auth.forgotSentTitle")}</div>
             <p className="auth-simple-copy">
-              Kiểm tra hộp thư <strong>{email}</strong> để đặt lại mật khẩu.
+              {t("auth.forgotSentPrefix")} <strong>{email}</strong> {t("auth.forgotSentSuffix")}
             </p>
           </div>
         )}

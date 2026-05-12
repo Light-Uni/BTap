@@ -305,6 +305,30 @@ button:active { transform: scale(0.97); opacity: 0.85; }
 }
 .wms-input:disabled { opacity: 0.55; cursor: not-allowed; }
 .wms-input::placeholder { color: var(--outline); }
+select.wms-input option {
+  background: var(--surface-container-lowest);
+  color: var(--on-surface);
+}
+
+.quantity-stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.quantity-stepper-btn {
+  width: 40px;
+  height: 40px;
+  min-height: 40px;
+  flex: 0 0 40px;
+  justify-content: center;
+  padding: 0;
+}
+.quantity-stepper-input {
+  height: 40px;
+  min-width: 0;
+  flex: 1 1 auto;
+  text-align: center;
+}
 
 /* Apply wms-input to all form elements inside .wms-form */
 .wms-form input,
@@ -680,7 +704,7 @@ button:active { transform: scale(0.97); opacity: 0.85; }
   justify-content: center;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  background: lightgrey;
+  background: var(--surface-container-lowest);
   gap: 18px;
   border-radius: 5px;
   border: 2px solid var(--auth-main-color);
@@ -709,7 +733,7 @@ button:active { transform: scale(0.97); opacity: 0.85; }
   justify-content: center;
   gap: 18px;
   text-align: center;
-  background: lightgrey;
+  background: var(--surface-container-lowest);
   border-radius: 5px;
   border: 2px solid var(--auth-main-color);
   box-shadow: 4px 4px var(--auth-main-color);
@@ -1156,6 +1180,26 @@ button:active { transform: scale(0.97); opacity: 0.85; }
   color: #ffffff;
 }
 
+.medicine-card-media {
+  width: min(86%, 180px);
+  height: 130px;
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.medicine-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
 .medicine-card-action {
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.1);
@@ -1356,6 +1400,11 @@ button:active { transform: scale(0.97); opacity: 0.85; }
   background: rgba(186,26,26,0.08);
   border-color: rgba(186,26,26,0.14);
   color: #ba1a1a;
+}
+
+:root:not([data-theme="dark"]) .medicine-card-media {
+  background: rgba(76,161,175,0.06);
+  border-color: rgba(44,62,80,0.08);
 }
 
 /* Responsive */
